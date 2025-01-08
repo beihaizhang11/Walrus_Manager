@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/scheduleListFragment">
+
+    <fragment
+        android:id="@+id/scheduleListFragment"
+        android:name="com.example.walrus_manager.ui.fragment.ScheduleListFragment"
+        android:label="日程列表">
+        <action
+            android:id="@+id/action_scheduleList_to_scheduleDetail"
+            app:destination="@id/scheduleDetailFragment" />
+        <action
+            android:id="@+id/action_scheduleList_to_settings"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/scheduleDetailFragment"
+        android:name="com.example.walrus_manager.ui.fragment.ScheduleDetailFragment"
+        android:label="日程详情">
+        <argument
+            android:name="scheduleId"
+            app:argType="long" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.walrus_manager.ui.fragment.SettingsFragment"
+        android:label="设置" />
+
+</navigation> 
