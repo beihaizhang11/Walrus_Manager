@@ -4,6 +4,9 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -18,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.walrus_manager.R;
 import com.example.walrus_manager.data.model.Event;
 import com.example.walrus_manager.ui.adapter.EventAdapter;
+import com.example.walrus_manager.util.ScheduleShareUtil;
 import com.example.walrus_manager.viewmodel.EventViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -25,6 +29,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class ScheduleDetailFragment extends Fragment implements EventAdapter.EventActionListener {
@@ -37,9 +42,38 @@ public class ScheduleDetailFragment extends Fragment implements EventAdapter.Eve
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         scheduleId = getArguments().getLong("scheduleId", -1);
         selectedDateTime = Calendar.getInstance();
         dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_schedule_detail, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_share) {
+            shareSchedule();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void shareSchedule() {
+        // 获取当前日程和事件数据
+        viewModel.getCurrentSchedule(scheduleId, schedule -> {
+            if (schedule != null) {
+                List<Event> events = viewModel.getEventsForSchedule().getValue();
+                if (events != null) {
+                    ScheduleShareUtil.ShareData shareData = new ScheduleShareUtil.ShareData(schedule, events);
+                    ScheduleShareUtil.shareSchedule(requireContext(), shareData);
+                }
+            }
+        });
     }
 
     @Nullable

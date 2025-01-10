@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.walrus_manager.data.AppDatabase;
 import com.example.walrus_manager.data.model.Event;
 import com.example.walrus_manager.repository.EventRepository;
+import com.example.walrus_manager.repository.ScheduleRepository;
+import com.example.walrus_manager.data.model.Schedule;
 
 import java.util.List;
 
@@ -69,5 +71,11 @@ public class EventViewModel extends AndroidViewModel {
             dataChanged.postValue(true);
             callback.onComplete(result);
         });
+    }
+
+    public void getCurrentSchedule(long scheduleId, ScheduleRepository.Callback<Schedule> callback) {
+        AppDatabase database = AppDatabase.getInstance(getApplication());
+        ScheduleRepository scheduleRepository = new ScheduleRepository(database.scheduleDao());
+        scheduleRepository.getScheduleById(scheduleId, callback);
     }
 } 

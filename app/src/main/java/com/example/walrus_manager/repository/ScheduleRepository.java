@@ -47,4 +47,11 @@ public class ScheduleRepository {
             callback.onComplete(null);
         });
     }
+
+    public void getScheduleById(long scheduleId, Callback<Schedule> callback) {
+        executorService.execute(() -> {
+            Schedule schedule = scheduleDao.getScheduleById(scheduleId);
+            callback.onComplete(schedule);
+        });
+    }
 } 

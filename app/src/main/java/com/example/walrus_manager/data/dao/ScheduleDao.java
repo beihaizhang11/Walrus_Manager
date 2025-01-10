@@ -23,4 +23,7 @@ public interface ScheduleDao {
 
     @Delete
     void delete(Schedule schedule);
+
+    @Query("SELECT * FROM schedules WHERE id = :scheduleId")
+    Schedule getScheduleById(long scheduleId);
 } 
