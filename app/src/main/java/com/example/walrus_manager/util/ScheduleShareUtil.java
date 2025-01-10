@@ -89,44 +89,56 @@ public class ScheduleShareUtil {
                 return;
             }
 
-            // 获取数据库和仓库实例
-            AppDatabase database = AppDatabase.getInstance(context);
-            ScheduleRepository scheduleRepository = new ScheduleRepository(database.scheduleDao());
-            EventRepository eventRepository = new EventRepository(database.eventDao());
-
-            // 重置ID以避免冲突
-            shareData.schedule.setId(0);
-            for (Event event : shareData.events) {
-                event.setId(0);
-            }
-
-            // 使用CountDownLatch等待数据库操作完成
-            CountDownLatch latch = new CountDownLatch(1);
-            final long[] scheduleId = new long[1];
-
-            // 插入日程
-            scheduleRepository.insert(shareData.schedule, id -> {
-                scheduleId[0] = id;
-                // 更新事件的scheduleId
-                for (Event event : shareData.events) {
-                    event.setScheduleId(id);
-                }
-
-                // 插入所有事件
-                insertEvents(eventRepository, shareData.events, 0, () -> {
-                    latch.countDown();
-                });
-            });
-
-            // 等待所有操作完成
-            try {
-                latch.await();
-                callback.onSuccess();
-            } catch (InterruptedException e) {
-                callback.onError("导入过程被中断");
-            }
+            importScheduleData(context, shareData, callback);
         } catch (IOException e) {
             callback.onError("读取文件失败：" + e.getMessage());
+        }
+    }
+
+    public static void importSchedule(Context context, ShareData shareData, ImportCallback callback) {
+        if (shareData == null || shareData.schedule == null) {
+            callback.onError("无效的日程数据");
+            return;
+        }
+        importScheduleData(context, shareData, callback);
+    }
+
+    private static void importScheduleData(Context context, ShareData shareData, ImportCallback callback) {
+        // 获取数据库和仓库实例
+        AppDatabase database = AppDatabase.getInstance(context);
+        ScheduleRepository scheduleRepository = new ScheduleRepository(database.scheduleDao());
+        EventRepository eventRepository = new EventRepository(database.eventDao());
+
+        // 重置ID以避免冲突
+        shareData.schedule.setId(0);
+        for (Event event : shareData.events) {
+            event.setId(0);
+        }
+
+        // 使用CountDownLatch等待数据库操作完成
+        CountDownLatch latch = new CountDownLatch(1);
+        final long[] scheduleId = new long[1];
+
+        // 插入日程
+        scheduleRepository.insert(shareData.schedule, id -> {
+            scheduleId[0] = id;
+            // 更新事件的scheduleId
+            for (Event event : shareData.events) {
+                event.setScheduleId(id);
+            }
+
+            // 插入所有事件
+            insertEvents(eventRepository, shareData.events, 0, () -> {
+                latch.countDown();
+            });
+        });
+
+        // 等待所有操作完成
+        try {
+            latch.await();
+            callback.onSuccess();
+        } catch (InterruptedException e) {
+            callback.onError("导入过程被中断");
         }
     }
 
@@ -141,7 +153,7 @@ public class ScheduleShareUtil {
         );
     }
 
-    public static ShareData parseShareData(String jsonData) {
+    private static ShareData parseShareData(String jsonData) {
         Gson gson = new Gson();
         return gson.fromJson(jsonData, ShareData.class);
     }

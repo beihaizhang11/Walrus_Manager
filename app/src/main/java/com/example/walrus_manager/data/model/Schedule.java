@@ -2,6 +2,7 @@ package com.example.walrus_manager.data.model;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.Ignore;
 
 @Entity(tableName = "schedules")
 public class Schedule {
@@ -11,12 +12,26 @@ public class Schedule {
     private String description;
     private long userId;
     private long createdAt;
+    private boolean isRemote;
+    private String createdBy;
 
     public Schedule(String title, String description, long userId) {
         this.title = title;
         this.description = description;
         this.userId = userId;
         this.createdAt = System.currentTimeMillis();
+        this.isRemote = false;
+        this.createdBy = "";
+    }
+
+    @Ignore
+    public Schedule(String title, String description, String createdBy, long createdAt) {
+        this.title = title;
+        this.description = description;
+        this.userId = 0;
+        this.createdAt = createdAt;
+        this.isRemote = true;
+        this.createdBy = createdBy;
     }
 
     public long getId() {
@@ -57,5 +72,21 @@ public class Schedule {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isRemote() {
+        return isRemote;
+    }
+
+    public void setRemote(boolean remote) {
+        isRemote = remote;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 } 

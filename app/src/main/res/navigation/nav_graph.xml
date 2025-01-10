@@ -28,6 +28,12 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.walrus_manager.ui.fragment.SettingsFragment"
-        android:label="设置" />
+        android:label="设置">
+        <action
+            android:id="@+id/action_settings_to_scheduleList"
+            app:destination="@id/scheduleListFragment"
+            app:popUpTo="@id/scheduleListFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation> 
